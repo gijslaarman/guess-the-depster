@@ -1,95 +1,65 @@
-import Image from "next/image";
+'use client'
+
 import styles from "./page.module.css";
+import { useCallback, useEffect, useState } from "react";
+import Autocomplete from "./components/autocomplete";
+import { ZoomImage } from './components/image'
+import currentDepster from '../data/current-depster.json'
+import Confetti from "react-confetti";
+
+const CURRENT_ANSWER = currentDepster.name
+const MAX_STEPS = 5
 
 export default function Home() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [win, setWin] = useState(false)
+
+  const setAnswer = useCallback((answer: string) => {
+    if (!answer) return // If answer is empty, we don't do anything
+    if (answer === CURRENT_ANSWER) {
+      setWin(true)
+    } else {
+      // Everytime the user selects an answer, we increase the step by 1
+      if (currentStep === MAX_STEPS) return // If we are at the last step, we don't do anything
+      setCurrentStep((s) => s + 1)
+    }
+  }, [])
+
+  useEffect(() => {
+
+    // User got the answer wrong so we go to the next step
+    if (currentStep === MAX_STEPS + 1) {
+
+    }
+  }, [currentStep])
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/assets/images/logo.png" role="presentation" alt="" style={{
+        width: '125px',
+        height: '125px'
+      }} />
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+      <h1 style={{ textAlign: 'center', width: '100%' }}>{win ? `You guessed the right person!` : "Who's this Depster?"}</h1>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+      {/* Image component with current image step */}
+      <ZoomImage step={win ? 5 : currentStep} />
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+      {win && <Confetti />}
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      {/* This should show the autocomplete input with list */}
+      {currentStep <= 5 && !win ?
+        <>
+          <div style={{ textAlign: 'center' }}>
+            <h3>{'Here\'s a hint:'}</h3>
+            <p>{currentDepster.hints[currentStep - 1]}</p>
+          </div>
+          <Autocomplete setAnswer={setAnswer} />
+        </>
+        :
+        <h2>{`It was ${currentDepster.name}`}</h2>
+      }
     </main>
   );
 }

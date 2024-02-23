@@ -1,0 +1,25 @@
+.stepImageWrapper {
+  border-radius: 50%;
+  border: 2px solid #fff;
+  overflow: hidden;
+  width: 300px;
+  max-width: 100%;
+}
+
+.stepImageWrapper img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stepImage {
+  transition: opacity 5s ease-in-out;
+  opacity: 0;
+  display: block;
+
+}
+
+.stepImage.loaded {
+  opacity: 1;
+}
